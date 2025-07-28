@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Data.SqlClient;
 using Microsoft.SqlServer;
+using System.Configuration;
 
 namespace AppLogin
 {
@@ -218,7 +219,9 @@ namespace AppLogin
             string telefone = txtTelefone.Text;
             string cpf = txtCPF.Text;
             string nome = txtNome.Text;
-            string stringConexao = "Data Source=CAETANO;Initial Catalog=AppLogin;Integrated Security=True;Encrypt=False";
+
+            //string stringConexao = "Data Source=CAETANO;Initial Catalog=AppLogin;Integrated Security=True;Encrypt=False";
+            string stringConexao = ConfigurationManager.ConnectionStrings["Minhaconexao"].ConnectionString;
 
             //Criando Conexao - Utilizando o Using para não precisar lembrar de fechar a conexao, um modo seguro
             using (SqlConnection conexao = new SqlConnection(stringConexao))
@@ -272,5 +275,6 @@ namespace AppLogin
                 }
             }
         }
+
     }
 }

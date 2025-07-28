@@ -1,5 +1,7 @@
 
 using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Protocols;
+using System.Configuration;
 
 namespace AppLogin
 {
@@ -20,12 +22,13 @@ namespace AppLogin
             }
             this.Show();
         }
-
+        //Botão Entrar
         private void botEntrar_Click(object sender, EventArgs e)
         {
             string email = txtEmailLogin.Text; 
             string senha = txtSenhaLogin.Text;
-            string stringconexao = "Data Source=CAETANO;Initial Catalog=AppLogin;Integrated Security=True;Encrypt=False";
+
+            string stringconexao = ConfigurationManager.ConnectionStrings["Minhaconexao"].ConnectionString;
 
             //Criando Conexao
             using (SqlConnection conexao = new SqlConnection(stringconexao))
