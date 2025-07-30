@@ -1,15 +1,16 @@
-﻿using System;
+﻿using AppLogin.Data;
+using Microsoft.Data.SqlClient;
+using Microsoft.SqlServer;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.Data.SqlClient;
-using Microsoft.SqlServer;
-using System.Configuration;
 
 namespace AppLogin
 {
@@ -24,7 +25,9 @@ namespace AppLogin
         bool verificaNome = false;
         bool verificaSobrenome = false;
         bool verificaTelefone = false;
+        string telefoneFinal = "";
         bool verificaCPF = false;
+        string cpfFinal = "";
         public TelaCadastro()
         {
             InitializeComponent();
@@ -210,71 +213,75 @@ namespace AppLogin
             }
         }
 
-        //Botão Cadastrar + Conexão com o Banco
+        //Botão Cadastrar
         private void botCadastrar_Click(object sender, EventArgs e)
         {
             //Variaveis
             string email = txtEmaiCadastro.Text;
             string senha = txtSenhaCastro.Text;
-            string telefone = txtTelefone.Text;
-            string cpf = txtCPF.Text;
+            string telefone = telefoneFinal;
+            string cpf = cpfFinal;
             string nome = txtNome.Text;
+            string sobrenome = txtSobrenome.Text;
+            string id;
+            
+            CRUD cadastro = new CRUD();
 
-            //string stringConexao = "Data Source=CAETANO;Initial Catalog=AppLogin;Integrated Security=True;Encrypt=False";
-            string stringConexao = ConfigurationManager.ConnectionStrings["Minhaconexao"].ConnectionString;
-
-            //Criando Conexao - Utilizando o Using para não precisar lembrar de fechar a conexao, um modo seguro
-            using (SqlConnection conexao = new SqlConnection(stringConexao))
+            if (cadastro.ProcuraUsuario(email) || cadastro.ProcuraUsuario(cpf) || cadastro.ProcuraUsuario(telefone))
             {
-                conexao.Open();
-
-                //Select para verificação, utilizando para metros ao inves de concatenação
-                string sqlComando = "SELECT COUNT(*) FROM Cadastros WHERE email = @email OR telefone = @telefone OR cpf = @cpf";
-
-                SqlCommand comando = new SqlCommand(sqlComando, conexao);
-                //Declarando os parametros, AddWithValue = atribui o valor
-                comando.Parameters.AddWithValue("@email", email);
-                comando.Parameters.AddWithValue("@telefone", telefone);
-                comando.Parameters.AddWithValue("@cpf", cpf);
-                
-                //O comando ExecuteScalar(), retorna apenas a primeira célula, ele retorna 0 pra nd ou 1 caso tenha acha
-                object resultado = comando.ExecuteScalar();
-                int jaEmUso = 0;
-
-                if (resultado != null)
+                MessageBox.Show("Já existe um cadastro com esses dados", "Erro ao cadastrar", MessageBoxButtons.OK);
+            }
+            else
+            {
+                int novoUsuario = cadastro.CriaUusario(nome, sobrenome, email, cpf, telefone, senha);
+                if(novoUsuario == 1)
                 {
-                    jaEmUso = Convert.ToInt32(resultado);
-                }
-
-                if (jaEmUso > 0)
-                {
-                    MessageBox.Show("Já existe um cadastro com esses dados", "Erro ao cadastrar", MessageBoxButtons.OK);
-                    return;
+                    MessageBox.Show("Cadastro realizado com sucesso!", "Novo Cadastro");
+                    this.Close();
                 }
                 else
                 {
-                    string insertSql = @"INSERT INTO Cadastros (nome, email, telefone, cpf, senha) VALUES (@nome, @email, @telefone, @cpf, @senha)";
-
-                    SqlCommand insertcomando = new SqlCommand(insertSql, conexao);
-                    insertcomando.Parameters.AddWithValue("@nome", nome);
-                    insertcomando.Parameters.AddWithValue("@email", email);
-                    insertcomando.Parameters.AddWithValue("@telefone", telefone);
-                    insertcomando.Parameters.AddWithValue("@cpf", cpf);
-                    insertcomando.Parameters.AddWithValue("@senha", senha);
-
-                    int linhasCriadas = (int)insertcomando.ExecuteNonQuery();
-                    if (linhasCriadas > 0)
-                    {
-                        MessageBox.Show("Cadastro realizado com sucesso!", "Novo Cadastro");
-                        this.Close(); // Fecha a tela de cadastro, se quiser
-                    }
-                    else
-                    {
-                        MessageBox.Show("Erro ao cadastrar. Tente novamente.");
-                    }
+                    MessageBox.Show("Erro ao cadastrar. Tente novamente.");
                 }
             }
         }
 
+        //Caixa CPF
+        private void txtCPF_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
+        {
+            char[] arrayCPF = txtCPF.Text.ToCharArray();
+            char[] arrayCPFFinal = new char[11];
+            int index = 0;
+            for (int i = 0; i < arrayCPF.Length && index < 11; i++)
+            {
+                char c = arrayCPF[i];
+                if (char.IsDigit(c))
+                {
+                    arrayCPFFinal[index] = c;
+                    index++;
+                }
+            }
+            cpfFinal = new string(arrayCPFFinal);
+            verificaCPF = true;
+        }
+
+        //Caixa Telefone
+        private void txtTelefone_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
+        {
+            char[] arrayTelefone = txtTelefone.Text.ToCharArray();
+            char[] arrayTelefoneFinal = new char[11];
+            int index = 0;
+            for(int i = 0;i < arrayTelefone.Length && index < 11;i++)
+            {
+                char c = arrayTelefone[i];
+                if (char.IsDigit(c))
+                {
+                    arrayTelefoneFinal[index] = c;
+                    index++;
+                }
+            }
+            telefoneFinal = new string(arrayTelefoneFinal);
+            verificaEmail = true;
+        }
     }
 }

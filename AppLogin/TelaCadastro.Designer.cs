@@ -42,7 +42,7 @@
             label6 = new Label();
             botSenhaCensura = new Button();
             botConfSenhaCensura = new Button();
-            textBox1 = new TextBox();
+            txtSobrenome = new TextBox();
             label7 = new Label();
             botCadastrar = new Button();
             linkVoltar = new LinkLabel();
@@ -79,6 +79,7 @@
             txtTelefone.Name = "txtTelefone";
             txtTelefone.Size = new Size(93, 23);
             txtTelefone.TabIndex = 2;
+            txtTelefone.MaskInputRejected += txtTelefone_MaskInputRejected;
             // 
             // txtCPF
             // 
@@ -87,6 +88,7 @@
             txtCPF.Name = "txtCPF";
             txtCPF.Size = new Size(89, 23);
             txtCPF.TabIndex = 3;
+            txtCPF.MaskInputRejected += txtCPF_MaskInputRejected;
             // 
             // txtSenhaCastro
             // 
@@ -184,13 +186,13 @@
             botConfSenhaCensura.UseVisualStyleBackColor = true;
             botConfSenhaCensura.Click += botConfSenhaCensura_Click;
             // 
-            // textBox1
+            // txtSobrenome
             // 
-            textBox1.Location = new Point(331, 41);
-            textBox1.MaxLength = 50;
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(188, 23);
-            textBox1.TabIndex = 14;
+            txtSobrenome.Location = new Point(331, 41);
+            txtSobrenome.MaxLength = 50;
+            txtSobrenome.Name = "txtSobrenome";
+            txtSobrenome.Size = new Size(188, 23);
+            txtSobrenome.TabIndex = 14;
             // 
             // label7
             // 
@@ -303,7 +305,7 @@
             Controls.Add(linkVoltar);
             Controls.Add(botCadastrar);
             Controls.Add(label7);
-            Controls.Add(textBox1);
+            Controls.Add(txtSobrenome);
             Controls.Add(botConfSenhaCensura);
             Controls.Add(botSenhaCensura);
             Controls.Add(label6);
@@ -342,7 +344,7 @@
         private Label label6;
         private Button botSenhaCensura;
         private Button botConfSenhaCensura;
-        private TextBox textBox1;
+        private TextBox txtSobrenome;
         private Label label7;
         private Button botCadastrar;
         private LinkLabel linkVoltar;

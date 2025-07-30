@@ -1,4 +1,5 @@
 
+using AppLogin.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Protocols;
 using System.Configuration;
@@ -25,40 +26,33 @@ namespace AppLogin
         //Botão Entrar
         private void botEntrar_Click(object sender, EventArgs e)
         {
-            string email = txtEmailLogin.Text; 
+            string id = txtEmailLogin.Text;
             string senha = txtSenhaLogin.Text;
 
-            string stringconexao = ConfigurationManager.ConnectionStrings["Minhaconexao"].ConnectionString;
+            CRUD login = new CRUD();
 
-            //Criando Conexao
-            using (SqlConnection conexao = new SqlConnection(stringconexao))
+            TratamentoId idTratamento = new TratamentoId();
+            string idTratada = idTratamento.Tratamento(id);
+
+            bool usuarioExistente = login.ProcuraUsuario(idTratada);
+            bool senhaCorreta = login.Logar(idTratada, senha);
+
+            if (usuarioExistente)
             {
-                conexao.Open();
-
-                string comandoSelect = "SELECT COUNT(*) FROM Cadastros WHERE email = @email and senha = @senha";
-                SqlCommand comando = new SqlCommand(comandoSelect, conexao);
-                //Parametros
-                comando.Parameters.AddWithValue("@email", email);
-                comando.Parameters.AddWithValue("@senha", senha);
-
-                object resultado = comando.ExecuteScalar();
-                int compara = 0;
-
-                if (resultado != null)
-                    compara = Convert.ToInt32(resultado);
-                if (compara > 0)
+                if (senhaCorreta)
                 {
-                    MessageBox.Show("Registro efetuado com sucesso", "Sucesso em login", MessageBoxButtons.OK);
-                    return;
+                    MessageBox.Show("Registro efetuado com sucesso", "Sucesso no login", MessageBoxButtons.OK);
                 }
                 else
                 {
-                    MessageBox.Show("Nenhum registro foi encontrado, e-mail ou senha incorretos", "Falha de login", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    MessageBox.Show("Por favor verifique sua senha","Senha incorreta",MessageBoxButtons.OK);
                 }
-
-
             }
+            else
+            {
+                MessageBox.Show("Id invalido ou inexistente", "Falha no login",MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
         }
     }
 }
